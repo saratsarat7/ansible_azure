@@ -1,0 +1,72 @@
+- name: Create Azure VM
+  hosts: localhost
+  connection: local
+  vars_files:
+    - ./variables.yml
+  tasks:
+    - name: Create SSH key for connection
+      openssh_keypair:
+        path: "~/.ssh/{{ sshKeyName }}"
+        type: rsa
+        size: 4096
+        state: present
+        force: no
+    - name: Create resource group
+      azure_rm_resourcegroup:
+        name: '{{ resource_group }}'
+        location: '{{ location }}'
+    - name: Create virtual network
+      azure_rm_virtualnetwork:
+        resource_group: '{{ resource_group }}'
+        name: '{{ vnetName }}'
+        address_prefixes: '{{ ipAddr }}'
+    - name: Add subnet
+      azure_rm_subnet:
+        resource_group: '{{ resource_group }}'
+        name: '{{ subNetName }}'
+        address_prefix: '{{ ipSubNet }}'
+        virtual_network: '{{ vnetName }}'
+    - name: Create Network Security Group that allows SSH
+      azure_rm_securitygroup:
+        resource_group: '{{ resource_group }}'
+        name: '{{ nsgName }}'
+        rules:
+          - name: SSH
+            protocol: Tcp
+            destination_port_range: 22
+            access: Allow
+            priority: 1001
+            direction: Inbound
+    - name: Create virtual network interface card
+      azure_rm_networkinterface:
+        resource_group: '{{ resource_group }}'
+        name: '{{ nicName }}'
+        virtual_network: '{{ vnetName }}'
+        subnet: '{{ subNetName }}'
+        public_ip_name: '{{ pubIpName }}'
+        security_group: '{{ nsgName }}'
+    - name: Get details for Public IP
+      azure_rm_publicipaddress_info:
+        resource_group: '{{ resource_group }}'
+        name: '{{ pubIpName }}'
+      register: cardDetails
+    - name: Create inventory file for furter processing.
+      lineinfile: 
+        line: "{{ vmName }} ansible_host={{ cardDetails['publicipaddresses'][0]['ip_address'] }} ansible_user={{ vmUserName }}"
+        path: ./inventory.yml
+    - name: Create VM
+      azure_rm_virtualmachine:
+        resource_group: '{{ resource_group }}'
+        name: '{{ vmName }}'
+        vm_size: Standard_DS1_v2
+        admin_username: '{{ vmUserName }}'
+        ssh_password_enabled: false
+        ssh_public_keys:
+          - path: /home/'{{ vmUserName }}'/.ssh/authorized_keys
+            key_data: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCqdd3RIf18hREvN9zO5ID4DdeGdVsVIzwZZZqRJ75QGojiY29Lo/Q1P8/OJDfLCoe/D6GSrep+GvaGmBhx8ETcxT3WP+tNNXzcUWCpj6ZHRYCEv4pvQAvFKNN+Br8Xra/MLFbhZWgAxHF70Cf8U02n/pgMOL97bpyPXLJrX9J5OsFOQR6CnXvjzbU0HeYNjJ4rE3uLzaRQ1STNXNJ+VNY/ep/GrRsm+reClMmVqiWGjD0moNlibkUFnE7ZbRAwTcj+I4salyHjYHN11YxkrKhpjY2RlnhP+o4yCYZ2G+Z0TLwuJRlh1yDfxbMLT4dDSIrKmbTCXMxF4UJmPYN08B1Jm2M4qDe8hng9OnzQrtRkJOKPeK80NSV7iVVtCLlHR0izJzcdEfDdUscld1+e77aHkofA57rvEgmsDsBHxa0BSV9hZSmPudMJZvcl8HMzTQ1wOeNqDqAFVJ/HNUC9WU5Q/DIfbUfGIsRlZnXe8QmGlh7TLmdQ0vwx1t71SDwkuvc= sarat@pirateS-Laptop"
+        network_interfaces: '{{ nicName }}'
+        image:
+          offer: debian-10
+          publisher: Debian
+          sku: '10'
+          version: latest

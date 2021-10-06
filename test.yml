@@ -1,0 +1,21 @@
+- name: Testing 
+  hosts: localhost
+  connection: local
+  vars_files:
+    - ./variables.yml
+  tasks:
+    - name: Create SSH key for connection
+      openssh_keypair:
+        path: "~/.ssh/{{ sshKeyName }}"
+        type: rsa
+        size: 4096
+        state: present
+        force: no
+    - name: Cat the public key into a variable.
+      command:
+        chdir: ~/.ssh/
+        cmd: cat "{{ sshKeyName }}.pub"
+      register: cat_contents
+    - name: Display Data
+      debug:
+        msg: '{{ cat_contents.stdout }}'
