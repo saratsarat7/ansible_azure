@@ -1,1 +1,1 @@
-ansibleVM ansible_host=20.185.81.192 ansible_user=azureuser ansible_ssh_private_key_file=~/.ssh/myAzureSshKey
+ansibleVM ansible_host=13.82.89.5 ansible_user=azureuser ansible_ssh_private_key_file=~/.ssh/myAzureSshKey

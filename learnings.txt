@@ -1,0 +1,1 @@
+To install new details we need to make it become:yes to have root user

@@ -1,0 +1,47 @@
+- name: Setup server config and install 2048 APP
+  hosts: ansibleVM
+  remote_user: azureuser
+  become: yes
+  vars_files:
+    - ./setup_vars.yml
+  tasks:
+    # Do we need nginx or anythign else is also okay.
+    - name: Install needed modules
+      apt: 
+        name: ['git', 'nodejs']
+        state: latest
+    - name: Crete direcory to clone
+      file:
+        path: '{{ cloneLocation }}'
+        state: directory
+    - name: Clone Repo
+      git:
+        repo: 'https://github.com/mateuszsokola/2048-in-react'
+        dest: '{{ cloneLocation }}'
+    - name: Install NPM modules
+      command:
+        chdir: '{{ cloneLocation }}'
+        cmd: npm install
+    # - name: Install PM2 for deployment.
+    #   command:
+    #     chdir: '{{ cloneLocation }}'
+    #     cmd: npm install pm2@latest -g
+    - name: Start Dev Server
+      command:
+        chdir: '{{ cloneLocation }}'
+        cmd: npm start &
+    # - name: Build App
+    #   command:
+    #     chdir: '{{ cloneLocation }}'
+    #     cmd: npm run build
+    # - name: Copy folder to /var/www
+    #   copy:
+    #     src: "{{ cloneLocation }}/build"
+    #     dest: /var/www
+    #     remote_src: no
+    # - name: Restart nginx service
+    #   service:
+    #     name: nginx
+    #     state: restarted
+
+        
