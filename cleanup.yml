@@ -12,3 +12,11 @@
       register: rg
     - debug:
         var: rg
+    - name: Remove Public Key
+      file:
+        path: ~/.ssh/{{ sshKeyName }}.pub
+        state: absent
+    - name: Remove Private Key
+      file:
+        path: ~/.ssh/{{ sshKeyName }}
+        state: absent
