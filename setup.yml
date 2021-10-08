@@ -3,45 +3,73 @@
   remote_user: azureuser
   become: yes
   vars_files:
-    - ./setup_vars.yml
+    - ./variables.yml
   tasks:
-    # Do we need nginx or anythign else is also okay.
-    - name: Install needed modules
+    - name: Install APT modules
       apt: 
-        name: ['git', 'nodejs']
+        name: ['git', 'nodejs', 'npm', 'nginx']
         state: latest
-    - name: Crete direcory to clone
+    - name: Create directory to clone
       file:
         path: '{{ cloneLocation }}'
         state: directory
     - name: Clone Repo
       git:
-        repo: 'https://github.com/mateuszsokola/2048-in-react'
+        repo: '{{ appRepo }}'
         dest: '{{ cloneLocation }}'
-    - name: Install NPM modules
-      command:
-        chdir: '{{ cloneLocation }}'
-        cmd: npm install
+        force: yes
+    # - name: Install package NPM modules
+    #   command:
+    #     chdir: '{{ cloneLocation }}'
+    #     cmd: npm install
+    - name: Install packages based on package.json.
+      npm:
+        path: '{{ cloneLocation }}'
     # - name: Install PM2 for deployment.
     #   command:
     #     chdir: '{{ cloneLocation }}'
     #     cmd: npm install pm2@latest -g
-    - name: Start Dev Server
-      command:
-        chdir: '{{ cloneLocation }}'
-        cmd: npm start &
-    # - name: Build App
+    # - name: Start Dev Server
     #   command:
     #     chdir: '{{ cloneLocation }}'
-    #     cmd: npm run build
-    # - name: Copy folder to /var/www
-    #   copy:
-    #     src: "{{ cloneLocation }}/build"
-    #     dest: /var/www
-    #     remote_src: no
-    # - name: Restart nginx service
-    #   service:
-    #     name: nginx
-    #     state: restarted
+    #     cmd: npm start &
+    - name: Change the Package.json homepage
+      replace:
+        path: /home/azureuser/2048_App/package.json
+        regexp: 'https://mateuszsokola.github.io/2048-in-react/'
+        replace: '.'
+    - name: Build App
+      command:
+        chdir: '{{ cloneLocation }}'
+        cmd: npm run build
+    # - name: Install module to serve the app
+    #   npm:
+    #     name: serve
+    #     global: yes
+    # - name: Start server
+    #   command:
+    #     chdir: '{{ cloneLocation }}'
+    #     cmd: serve -s build -l 3000
+    - name: Create directory to host the built application.
+      file:
+        path: '{{ appLocation }}'
+        state: directory
+    - name: Copy folder to move the built application
+      copy:
+        src: "{{ cloneLocation }}/build/"
+        dest: '{{ appLocation }}'
+        remote_src: yes
+    - name: Copy local nginx configuration file to Available Sites
+      copy:
+        src: '{{ localConfig }}'
+        dest: '{{ sitesAvailable }}'
+    - name: Copy local nginx configuration file to Available Sites
+      copy:
+        src: '{{ localConfig }}'
+        dest: '{{ sitesEnabled }}'
+    - name: Restart nginx service
+      service:
+        name: nginx
+        state: restarted
 
         
