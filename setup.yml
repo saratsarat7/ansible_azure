@@ -38,6 +38,7 @@
         path: /home/azureuser/2048_App/package.json
         regexp: 'https://mateuszsokola.github.io/2048-in-react/'
         replace: '.'
+      ignore_errors: yes
     - name: Build App
       command:
         chdir: '{{ cloneLocation }}'
