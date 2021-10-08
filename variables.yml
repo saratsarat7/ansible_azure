@@ -4,21 +4,21 @@
   sshKeyName: myAzureSshKey
 # Below are used to create a Azure Environment
   resource_group: MyResourceAnsible
-  location: eastus
-  vnetName: ansibleVnet
+  location:   eastus
+  vnetName:   ansibleVnet
   subNetName: ansibleSubnet
-  pubIpName: ansibleIpAddr
-  nicName: ansibleCard
-  vmName: ansibleVM
+  pubIpName:  ansibleIpAddr
+  nicName:    ansibleCard
+  vmName:     ansibleVM
   vmUserName: azureuser
-  ipAddr: "111.222.0.0/16"
-  ipSubNet: "111.222.1.0/24"
-  nsgName: ansibleNSG
+  ipAddr:     "111.222.0.0/16"
+  ipSubNet:   "111.222.1.0/24"
+  nsgName:    ansibleNSG
 # Port Used to Deploy App
-  appPort: 3000
+  appPort:    3000
 # SSH Key name
-  cloneLocation: /home/azureuser/2048_App
-  appLocation: /var/www/nodeapp
+  cloneLocation:  /home/azureuser/node_app
+  appLocation:    /var/www/nodeapp
   sitesAvailable: /etc/nginx/sites-available
-  sitesEnabled: /etc/nginx/sites-enabled
-  localConfig: ./nginx_conf.cfg
+  sitesEnabled:   /etc/nginx/sites-enabled
+  localConfig:  ./nginx_conf.cfg
