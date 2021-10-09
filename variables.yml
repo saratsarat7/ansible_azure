@@ -15,7 +15,11 @@
   nsgName:    ansibleNSG
 # Port Exposed to External Network
   appPort:    3000
-
+  
+##### Node Variables #####
+# Your app repo
+  appRepo: https://github.com/mateuszsokola/2048-in-react
+# Node Server Config
   cloneLocation:  /home/azureuser/node_app
   appLocation:    /var/www/nodeapp
   sitesAvailable: /etc/nginx/sites-available
