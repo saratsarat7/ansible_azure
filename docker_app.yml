@@ -1,0 +1,32 @@
+- name: Setup docker server and build docker files.
+  hosts: ansibleVM
+  remote_user: azureuser
+  become: yes
+  vars_files:
+    - ./variables.yml
+  tasks:
+    - name: Grep installed pacakages and look for Docker
+      command:
+        cmd: apt list --installed | grep ^docker
+      register: cmd_out
+    - name: Downlaod Docker Script and install (only if its not installed already)
+      command:
+        cmd: '{{ item }}'
+      with_items: 
+        - curl -fsSL https://get.docker.com -o '{{ dockerInstallFile }}'
+        - ./{{ dockerInstallFile }}
+      when: cmd_out.stdout == ""
+    - name: Create directory for docker
+      file:
+        path: '{{ dockerHome }}'
+        state: directory
+    - name: Copy docker file and compose from local to remote
+      copy:
+        src: '{{ localDocker }}'
+        dest: '{{ dockerHome }}'
+    - name: Run docker build command
+      command:
+        chdir: '{{ dockerHome }}'
+        cmd: docker build -t saratsarat7/local_build .
+  
+       

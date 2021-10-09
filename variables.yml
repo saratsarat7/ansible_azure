@@ -15,7 +15,12 @@
   nsgName:    ansibleNSG
 # Port Exposed to External Network
   appPort:    3000
-  
+
+##### Docker Variables #####
+  dockerInstallFile:  get-docker.sh
+  dockerHome:         /home/azureuser/docker_dev
+  localDocker:        ./docker_files/
+
 ##### Node Variables #####
 # Your app repo
   appRepo: https://github.com/mateuszsokola/2048-in-react
