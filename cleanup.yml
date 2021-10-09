@@ -14,9 +14,9 @@
         var: rg
     - name: Remove Public Key
       file:
-        path: ~/.ssh/{{ sshKeyName }}.pub
+        path: ./{{ sshKeyName }}.pub
         state: absent
     - name: Remove Private Key
       file:
-        path: ~/.ssh/{{ sshKeyName }}
+        path: ./{{ sshKeyName }}
         state: absent

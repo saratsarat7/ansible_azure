@@ -26,7 +26,7 @@
         name: '{{ subNetName }}'
         address_prefix: '{{ ipSubNet }}'
         virtual_network: '{{ vnetName }}'
-    - name: Create Network Security Group that allows SSH
+    - name: Create Network Security Group with allowed ports
       azure_rm_securitygroup:
         resource_group: '{{ resource_group }}'
         name: '{{ nsgName }}'
@@ -37,7 +37,7 @@
             access: Allow
             priority: 1001
             direction: Inbound
-          - name: NPM App in Development Mode
+          - name: Open extra port for development
             protocol: Tcp
             destination_port_range: '{{ appPort }}'
             access: Allow
@@ -53,14 +53,14 @@
         security_group: '{{ nsgName }}'
     - name: Create SSH key for connection
       openssh_keypair:
-        path: "~/.ssh/{{ sshKeyName }}"
+        path: "./{{ sshKeyName }}"
         type: rsa
         size: 4096
         state: present
         force: no
-    - name: Cat the public key into a variable.
+    - name: Cat the public key into a variable
       command:
-        chdir: ~/.ssh/
+        chdir: ./
         cmd: cat "{{ sshKeyName }}.pub"
       register: cat_contents
     - name: Create VM
@@ -96,3 +96,6 @@
       lineinfile: 
         line: "{{ vmName }} ansible_host={{ cardDetails['publicipaddresses'][0]['ip_address'] }} ansible_user={{ vmUserName }} ansible_ssh_private_key_file=~/.ssh/{{ sshKeyName }}"
         path: ./inventory.yml
+    - name: IP Address of the VM.
+      debug:
+        msg: "{{ cardDetails['publicipaddresses'][0]['ip_address'] }}"

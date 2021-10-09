@@ -1,5 +1,4 @@
-# Your app repo
-  appRepo: https://github.com/mateuszsokola/2048-in-react
+##### Server Setup #####
 # SSH Key name
   sshKeyName: myAzureSshKey
 # Below are used to create a Azure Environment
@@ -14,9 +13,9 @@
   ipAddr:     "111.222.0.0/16"
   ipSubNet:   "111.222.1.0/24"
   nsgName:    ansibleNSG
-# Port Used to Deploy App
+# Port Exposed to External Network
   appPort:    3000
-# SSH Key name
+
   cloneLocation:  /home/azureuser/node_app
   appLocation:    /var/www/nodeapp
   sitesAvailable: /etc/nginx/sites-available

@@ -18,21 +18,9 @@
         repo: '{{ appRepo }}'
         dest: '{{ cloneLocation }}'
         force: yes
-    # - name: Install package NPM modules
-    #   command:
-    #     chdir: '{{ cloneLocation }}'
-    #     cmd: npm install
     - name: Install packages based on package.json.
       npm:
         path: '{{ cloneLocation }}'
-    # - name: Install PM2 for deployment.
-    #   command:
-    #     chdir: '{{ cloneLocation }}'
-    #     cmd: npm install pm2@latest -g
-    # - name: Start Dev Server
-    #   command:
-    #     chdir: '{{ cloneLocation }}'
-    #     cmd: npm start &
     - name: Change the Package.json homepage
       replace:
         path: /home/azureuser/2048_App/package.json
@@ -43,14 +31,6 @@
       command:
         chdir: '{{ cloneLocation }}'
         cmd: npm run build
-    # - name: Install module to serve the app
-    #   npm:
-    #     name: serve
-    #     global: yes
-    # - name: Start server
-    #   command:
-    #     chdir: '{{ cloneLocation }}'
-    #     cmd: serve -s build -l 3000
     - name: Create directory to host the built application.
       file:
         path: '{{ appLocation }}'
