@@ -4,13 +4,6 @@
   vars_files:
     - ./variables.yml
   tasks:
-    - name: Create SSH key for connection
-      openssh_keypair:
-        path: "~/.ssh/{{ sshKeyName }}"
-        type: rsa
-        size: 4096
-        state: present
-        force: no
     - name: Create resource group
       azure_rm_resourcegroup:
         name: '{{ resource_group }}'
@@ -79,6 +72,7 @@
           publisher: Debian
           sku: '10'
           version: latest
+        state: present
     - name: Get details for Public IP
       azure_rm_publicipaddress_info:
         resource_group: '{{ resource_group }}'
@@ -86,16 +80,29 @@
       register: cardDetails
     - name: Delete inventory file
       file:
-        state: absent
         path: ./inventory.yml
+        state: absent
     - name: Create new inventory file
       file:
         path: "./inventory.yml"
         state: touch
     - name: Update inventory details.
       lineinfile: 
-        line: "{{ vmName }} ansible_host={{ cardDetails['publicipaddresses'][0]['ip_address'] }} ansible_user={{ vmUserName }} ansible_ssh_private_key_file=~/.ssh/{{ sshKeyName }}"
+        line: "{{ vmName }} ansible_host={{ cardDetails['publicipaddresses'][0]['ip_address'] }} ansible_user={{ vmUserName }} ansible_ssh_private_key_file=./{{ sshKeyName }}"
         path: ./inventory.yml
-    - name: IP Address of the VM.
-      debug:
-        msg: "{{ cardDetails['publicipaddresses'][0]['ip_address'] }}"
+    - name: Delete login file
+      file:
+        path: ./login.sh
+        state: absent
+    - name: Create ligin file
+      file:
+        path: "./login.sh"
+        state: touch
+    - name: Update login details.
+      lineinfile: 
+        line: "ssh -o StrictHostKeyChecking=no {{ vmUserName }}@{{ cardDetails['publicipaddresses'][0]['ip_address'] }} -i ./{{ sshKeyName }}"
+        path: ./login.sh
+    - name: Make script executable
+      command:
+        chdir: ./
+        cmd: chmod +x ./login.sh
