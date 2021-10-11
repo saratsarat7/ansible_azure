@@ -20,7 +20,7 @@
         - chmod +x ./{{ dockerInstallFile }}
         - ./{{ dockerInstallFile }}
       when: '"docker-ce" not in ansible_facts.packages'
-    - name: Create directory for docker
+    - name: Create local directory for docker
       file:
         path: '{{ dockerHome }}'
         state: directory
@@ -28,12 +28,17 @@
       copy:
         src: '{{ localDocker }}'
         dest: '{{ dockerHome }}'
-    - name: Run docker build command
+    - name: Build Image
       command:
         chdir: '{{ dockerHome }}'
-        cmd: docker build -t '{{ dockerUser }}'/'{{ appName }}' .
-    - name: Start Server
+        cmd: docker build -t '{{ dockerUser }}/{{ appName }}' .
+    - name: Archive image
       command:
         chdir: '{{ dockerHome }}'
-        cmd: docker run -d -p '{{ appPort }}:{{ nginxPort }}' '{{ dockerUser }}'/'{{ appName }}'
+        cmd: docker save -o {{ imageArchive }} {{ dockerUser }}/{{ appName }} 
+    - name: Downlaod docker archive image from remote to local
+      fetch:
+        src: '{{ dockerHome }}/{{ imageArchive }}'
+        dest: '{{ localDocker }}'
+        flat: yes
        

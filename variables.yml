@@ -25,6 +25,7 @@
   nginxPort:          80
   dockerUser:         saratsarat7
   appName:            nginx_app
+  imageArchive:       custom_image.tar
 
 ##### Node Variables #####
 # Your app repo
