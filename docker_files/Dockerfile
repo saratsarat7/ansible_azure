@@ -1,11 +1,13 @@
-FROM ubuntu
+FROM node:alpine as build_context
 
-RUN apt-get update
-RUN apt-get upgrade -y
-RUN apt-get install nodejs npm git nginx -y
-RUN git clone https://github.com/mateuszsokola/2048-in-react
-RUN cd 2048-in-react
+RUN apk add --update git
+RUN git clone https://github.com/saratsarat7/2048-in-react /home/app/git
+
+WORKDIR /home/app/git
+
 RUN npm install
 RUN npm run build
 
-CMD ["echo","Everything completed"]
+FROM nginx
+
+COPY --from=build_context /home/app/git/build /usr/share/nginx/html

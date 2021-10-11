@@ -20,10 +20,15 @@
   dockerInstallFile:  get-docker.sh
   dockerHome:         /home/azureuser/docker_dev
   localDocker:        ./docker_files/
+  # We will use the same port we are exposing to internet
+  # localPort:        appPort
+  nginxPort:          80
+  dockerUser:         saratsarat7
+  appName:            nginx_app
 
 ##### Node Variables #####
 # Your app repo
-  appRepo: https://github.com/mateuszsokola/2048-in-react
+  appRepo: https://github.com/saratsarat7/2048-in-react
 # Node Server Config
   cloneLocation:  /home/azureuser/node_app
   appLocation:    /var/www/nodeapp

@@ -5,17 +5,21 @@
   vars_files:
     - ./variables.yml
   tasks:
-    - name: Grep installed pacakages and look for Docker
-      command:
-        cmd: apt list --installed | grep ^docker
-      register: cmd_out
+    - name: Install Python3 APT
+      apt: 
+        name: ['python3-apt']
+        state: latest
+    - name: Gather all installed packages
+      package_facts:
+        manager: apt
     - name: Downlaod Docker Script and install (only if its not installed already)
       command:
         cmd: '{{ item }}'
       with_items: 
         - curl -fsSL https://get.docker.com -o '{{ dockerInstallFile }}'
+        - chmod +x ./{{ dockerInstallFile }}
         - ./{{ dockerInstallFile }}
-      when: cmd_out.stdout == ""
+      when: '"docker-ce" not in ansible_facts.packages'
     - name: Create directory for docker
       file:
         path: '{{ dockerHome }}'
@@ -27,6 +31,9 @@
     - name: Run docker build command
       command:
         chdir: '{{ dockerHome }}'
-        cmd: docker build -t saratsarat7/local_build .
-  
+        cmd: docker build -t '{{ dockerUser }}'/'{{ appName }}' .
+    - name: Start Server
+      command:
+        chdir: '{{ dockerHome }}'
+        cmd: docker run -d -p '{{ appPort }}:{{ nginxPort }}' '{{ dockerUser }}'/'{{ appName }}'
        
