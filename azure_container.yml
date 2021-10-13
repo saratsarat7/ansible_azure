@@ -1,0 +1,46 @@
+- name: Start container instances.
+  hosts: localhost
+  connection: local
+  vars_files:
+    - ./variables.yml
+  tasks:
+    - name: Create resource group
+      azure_rm_resourcegroup:
+        name: '{{ resource_group }}'
+        location: '{{ location }}'
+    - name: Create Azure Container Registry
+      azure_rm_containerregistry:
+        resource_group: "{{ resource_group }}"
+        name: "{{ registryName }}"
+        admin_user_enabled: True
+        sku: Standard
+      register: acr_result
+    - name: Debug
+      debug:
+        msg: '{{ acr_result }}'
+    - name: Login docker registry
+      docker_login:
+        registry: "{{ registryName }}.azurecr.io"
+        username: "{{ registryName }}"
+        password: "vXSyLgZGemEdFojnwDcemPWcm9MePim="
+        email: "{{ email }}"
+    # - name: Docker Build and Push
+    #   docker_image:
+    #     path: "{{ localDocker }}"
+    #     name: "{{ registryName }}.azurecr.io/{{ imageName }}"
+    #     push: yes
+    # - name: Create Azure Container Instance
+    #   azure_rm_containerinstance:
+    #     resource_group: "{{ resource_group }}"
+    #     name: "{{ imageName }}"
+    #     ip_address: public
+    #     ports:
+    #       - "{{ appPort }}"
+    #     registry_login_server: "{{ registryName }}.azurecr.io"
+    #     registry_username: "{{ registryName }}"
+    #     registry_password: "{{ acr_result.credentials.password }}"
+    #     containers:
+    #       - name: "{{ imageName }}"
+    #         ports:
+    #           - "{{ appPort }}"
+    #         image: "{{ registryName }}.azurecr.io/{{ imageName }}"

@@ -1,7 +1,7 @@
 ##### Server Setup #####
 # SSH Key name
   sshKeyName: myAzureSshKey
-# Below are used to create a Azure Environment
+# Below are used to create a Azure VM Environment
   resource_group: MyResourceAnsible
   location:   eastus
   vnetName:   ansibleVnet
@@ -15,6 +15,11 @@
   nsgName:    ansibleNSG
 # Port Exposed to External Network
   appPort:    3000
+# Below are used to create a Azure Container Environment
+# Some variable which are defined above can be reused !!
+  registryName:       ansibleregistry
+  email:              saratsarat7@gmail.com
+  imageName:          dockerImage
 
 ##### Docker Variables #####
   dockerInstallFile:  get-docker.sh
