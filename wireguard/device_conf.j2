@@ -1,0 +1,9 @@
+[Interface]
+PrivateKey = {{ keyData.results[2].stdout }}
+Address = '{{ wireGuardIP }}'
+DNS = '{{ wireDNS }}'
+
+[Peer]
+PublicKey = {{ keyData.results[1].stdout }}
+AllowedIPs = {{ wireAllowed }}
+Endpoint = keyData.results[4].stdout:{{ appPort }}

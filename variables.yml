@@ -32,6 +32,12 @@
   appName:            nginx_app
   imageArchive:       custom_image.tar
 
+##### WireGuard Variables #####
+  wireGuardLoc:        /etc/wireguard/
+  wireGuardIP:        111.222.1.1/24
+  wireDNS:            1.1.1.1, 1.0.0.1
+  wireAllowed:        0.0.0.0/0
+
 ##### Node Variables #####
 # Your app repo
   appRepo: https://github.com/saratsarat7/2048-in-react

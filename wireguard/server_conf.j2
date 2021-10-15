@@ -1,0 +1,11 @@
+[Interface]
+PrivateKey = {{ keyData.results[0].stdout }}
+Address = '{{ wireGuardIP }}'
+DNS = '{{ wireDNS }}'
+PostUp = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+ListenPort = {{ appPort }}
+
+[Peer]
+PublicKey = {{ keyData.results[3].stdout }}
+AllowedIPs = {{ wireAllowed }}

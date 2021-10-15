@@ -1,0 +1,56 @@
+- name: Setup docker server and build docker files.
+  hosts: ansibleVM
+  remote_user: azureuser
+  become: yes
+  vars_files:
+    - ./variables.yml
+  tasks:
+    - name: Install Wireguard and other tools needed
+      apt: 
+        name: ['wireguard', 'ufw', 'qrencode']
+        state: latest
+    - name: Update Firewall rules
+      command:
+        cmd: '{{ item }}'
+      with_items: 
+        - ufw allow ssh
+        - ufw allow {{ appPort }}/udp
+    - name: Enable UFW
+      community.general.ufw:
+        state: enabled
+        policy: allow
+    - name: Generate Keys
+      shell:
+        chdir: '{{ wireGuardLoc }}'
+        cmd: '{{ item }}'
+      with_items: 
+        - umask 077
+        - wg genkey | tee server_privatekey | wg pubkey > server_publickey
+        - wg genkey | tee device_privatekey | wg pubkey > device_publickey
+    - name: Cat keys to temp variables
+      command:
+        chdir: '{{ wireGuardLoc }}'
+        cmd: '{{ item }}'
+      with_items:
+        - cat server_privatekey
+        - cat server_publickey
+        - cat device_privatekey
+        - cat device_publickey
+        - curl ident.me
+      register: keyData
+    - name: Debug
+      debug:
+        msg: '{{ keyData }}'
+    - name: Create Server conf
+      template:
+        src: ./wireguard/server_conf.j2
+        dest: '{{ wireGuardLoc }}/wg0.conf'
+        mode: '0600'
+    - name: Create Client conf
+      template:
+        src: ./wireguard/device_conf.j2
+        dest: '{{ wireGuardLoc }}/device.conf'
+        mode: '0600'
+    - name: Start Wireguard
+      shell:
+        cmd: wg-quick up wg0
