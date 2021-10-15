@@ -30,8 +30,7 @@
             access: Allow
             priority: 1001
             direction: Inbound
-          - name: Open extra port for development
-            protocol: Tcp
+          - name: Extra Port for Development
             destination_port_range: '{{ appPort }}'
             access: Allow
             priority: 1002
@@ -86,7 +85,7 @@
       file:
         path: "./inventory.yml"
         state: touch
-    - name: Update inventory details.
+    - name: Update inventory details
       lineinfile: 
         line: "{{ vmName }} ansible_host={{ cardDetails['publicipaddresses'][0]['ip_address'] }} ansible_user={{ vmUserName }} ansible_ssh_private_key_file=./{{ sshKeyName }}"
         path: ./inventory.yml
@@ -98,7 +97,7 @@
       file:
         path: "./login.sh"
         state: touch
-    - name: Update login details.
+    - name: Update login details
       lineinfile: 
         line: "ssh -o StrictHostKeyChecking=no {{ vmUserName }}@{{ cardDetails['publicipaddresses'][0]['ip_address'] }} -i ./{{ sshKeyName }}"
         path: ./login.sh
