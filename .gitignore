@@ -3,3 +3,5 @@ myAzureSshKey.pub
 myAzureSshKey
 login.sh
 docker_files/custom_image.tar
+mySSHKey.pub
+mySSHKey

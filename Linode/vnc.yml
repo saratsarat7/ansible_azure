@@ -1,0 +1,15 @@
+- name: Setup a VNC server
+  hosts: ansibleLinode
+  remote_user: root
+  become: yes
+  vars_files:
+    - ../variables.yml
+  tasks:
+    - name: Update APT
+      apt:
+        upgrade: 'yes'
+        update_cache: yes
+    - name: Install Modules
+      apt: 
+        name: ['tigervnc-standalone-server', 'tigervnc-xorg-extension', 'ufw', 'slim', 'xfce4']
+        state: latest

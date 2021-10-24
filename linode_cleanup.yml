@@ -1,0 +1,25 @@
+- name: Cleanup everything !!
+  hosts: localhost
+  connection: local
+  vars_files:
+    - ./variables.yml
+  tasks:
+    - name: Get list of available linodes
+      shell:
+        cmd: '{{ item }}'
+      with_items:
+        - linode-cli linodes list --json
+      register: linode_Details
+    - set_fact: jsonValues="{{ linode_Details.results[0].stdout|from_json }}"
+    - name: Delete Linodes one by one
+      shell:
+        cmd: linode-cli linodes delete {{ item.id }}
+      loop: '{{ jsonValues }}'
+    - name: Remove Public Key
+      file:
+        path: ./{{ sshKeyName }}.pub
+        state: absent
+    - name: Remove Private Key
+      file:
+        path: ./{{ sshKeyName }}
+        state: absent

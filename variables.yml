@@ -1,6 +1,6 @@
 ##### Server Setup #####
 # SSH Key name
-  sshKeyName: myAzureSshKey
+  sshKeyName: mySSHKey
 # Below are used to create a Azure VM Environment
   resource_group: MyResourceAnsible
   location:   eastus
@@ -20,6 +20,17 @@
   registryName:       ansibleregistry
   email:              saratsarat7@gmail.com
   imageName:          dockerImage
+
+##### Linode Variables #####
+  linodeName:         ansibleLinode
+  # linode-cli linodes types
+  # linodeType:         g6-standard-4
+  linodeType:         g6-nanode-1
+  # linode-cli regions list
+  linodeRegion:       ap-west
+  # https://api.linode.com/v4/images
+  linodeImage:        linode/debian11
+  linodePass:         myRootPass@1
 
 ##### Docker Variables #####
   dockerInstallFile:  get-docker.sh

@@ -1,0 +1,53 @@
+- name: Create Linode
+  hosts: localhost
+  connection: local
+  vars_files:
+    - ./variables.yml
+  tasks:
+    - name: Create SSH key for connection
+      openssh_keypair:
+        path: './{{ sshKeyName }}'
+        type: rsa
+        size: 4096
+        state: present
+        force: no
+    - name: Cat the public key into a variable
+      command:
+        chdir: ./
+        cmd: cat '{{ sshKeyName }}.pub'
+      register: cat_contents
+    - name: Create a new Linode instance.
+      shell:
+        cmd: '{{ item }}'
+      with_items:
+        - linode-cli linodes create --type '{{ linodeType }}' --region '{{ linodeRegion }}' --image '{{ linodeImage }}' --root_pass '{{ linodePass }}' --label '{{ linodeName }}' --authorized_keys '{{ cat_contents.stdout }}' --json
+      register: linode_Details
+    - set_fact: jsonValues="{{ linode_Details.results[0].stdout|from_json }}"
+    - name: Delete inventory file
+      file:
+        path: ./inventory.yml
+        state: absent
+    - name: Create new inventory file
+      file:
+        path: "./inventory.yml"
+        state: touch
+    - name: Update inventory details
+      lineinfile: 
+        line: "{{ linodeName }} ansible_host={{ jsonValues[0].ipv4[0] }} ansible_user=root ansible_ssh_private_key_file=./{{ sshKeyName }}"
+        path: ./inventory.yml
+    - name: Delete login file
+      file:
+        path: ./login.sh
+        state: absent
+    - name: Create login file
+      file:
+        path: "./login.sh"
+        state: touch
+    - name: Update login details
+      lineinfile: 
+        line: "ssh -o StrictHostKeyChecking=no root@{{ jsonValues[0].ipv4[0] }} -i ./{{ sshKeyName }}"
+        path: ./login.sh
+    - name: Make script executable
+      command:
+        chdir: ./
+        cmd: chmod +x ./login.sh
