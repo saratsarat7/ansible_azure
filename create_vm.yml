@@ -93,7 +93,7 @@
       file:
         path: ./login.sh
         state: absent
-    - name: Create ligin file
+    - name: Create login file
       file:
         path: "./login.sh"
         state: touch
