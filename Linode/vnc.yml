@@ -11,5 +11,40 @@
         update_cache: yes
     - name: Install Modules
       apt: 
-        name: ['tigervnc-standalone-server', 'tigervnc-xorg-extension', 'ufw', 'slim', 'xfce4']
+        name: '{{ item }}'
         state: latest
+      with_items: 
+        - tigervnc-standalone-server
+        - tigervnc-xorg-extension
+        - slim
+        - xfce4
+        - expect
+        - chromium
+        - htop
+    - name: Copy password script
+      copy:
+        src: 'set_pass.sh'
+        dest: '/home/vncUser/'
+    - name: Make script executable
+      file:
+        path: /home/vncUser/set_pass.sh
+        mode: a+x
+      # command:
+      #   chdir: /home/vncUser/
+      #   cmd: chmod +x ./set_pass.sh
+    - name: Execute script and reboot
+      shell:
+        cmd: '{{ item }}'
+        chdir: /home/vncUser/
+      with_items:
+        - ./set_pass.sh
+    - name: Reboot and wait for it to restart
+      reboot:
+        connect_timeout: 5
+        post_reboot_delay: 15
+        test_command: whoami
+    - name: Start VNC Server
+      shell:
+        cmd: '{{ item }}'
+      with_items:
+        - vncserver :{{ vncDisplayPort }} -geometry {{ desktopResolution }} -desktop "{{ linodeName }}"

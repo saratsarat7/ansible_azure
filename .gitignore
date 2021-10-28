@@ -5,3 +5,6 @@ login.sh
 docker_files/custom_image.tar
 mySSHKey.pub
 mySSHKey
+test.yml
+Linode/forwardPort.sh
+Linode/Temp.txt

@@ -32,6 +32,12 @@
   linodeImage:        linode/debian11
   linodePass:         myRootPass@1
 
+##### Linode VNC #####
+  desktopResolution:  1360x786
+  vncDisplayPort:     1
+  localPort:          3333
+  remotePort:         5901
+
 ##### Docker Variables #####
   dockerInstallFile:  get-docker.sh
   dockerHome:         /home/azureuser/docker_dev

@@ -2,7 +2,7 @@
   hosts: localhost
   connection: local
   vars_files:
-    - ./variables.yml
+    - ../variables.yml
   tasks:
     - name: Get list of available linodes
       shell:
@@ -17,9 +17,9 @@
       loop: '{{ jsonValues }}'
     - name: Remove Public Key
       file:
-        path: ./{{ sshKeyName }}.pub
+        path: ../{{ sshKeyName }}.pub
         state: absent
     - name: Remove Private Key
       file:
-        path: ./{{ sshKeyName }}
+        path: ../{{ sshKeyName }}
         state: absent
